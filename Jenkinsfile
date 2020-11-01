@@ -80,7 +80,7 @@ pipeline {
         stage('Checkstyle Report') {
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    sh 'vendor/bin/phpcs --report=checkstyle --report-file=build/logs/checkstyle.xml --standard=phpcs.xml.dist --extensions=php,inc -wp || exit 0'
+                    sh 'vendor/bin/phpcs --report=checkstyle --report-file=build/logs/checkstyle.xml --standard=phpcs.xml.dist --extensions=php,inc -wp'
                     checkstyle pattern: 'build/logs/checkstyle.xml'
                 }
             }
@@ -88,14 +88,14 @@ pipeline {
 
 //         stage('Mess Detection Report') {
 //             steps {
-//                 sh 'vendor/bin/phpmd . xml phpmd.xml --reportfile build/logs/pmd.xml || exit 0'
+//                 sh 'vendor/bin/phpmd . xml phpmd.xml --reportfile build/logs/pmd.xml'
 //                 pmd canRunOnFailed: true, pattern: 'build/logs/pmd.xml'
 //             }
 //         }
 
 //         stage('CPD Report') {
 //             steps {
-//                 sh 'vendor/bin/phpcpd --log-pmd build/logs/pmd-cpd.xml --exclude bin --exclude vendor --exclude src/Migrations --exclude var . --progress || exit 0'
+//                 sh 'vendor/bin/phpcpd --log-pmd build/logs/pmd-cpd.xml --exclude bin --exclude vendor --exclude src/Migrations --exclude var . --progress'
 //                 dry canRunOnFailed: true, pattern: 'build/logs/pmd-cpd.xml'
 //             }
 //         }
