@@ -12,6 +12,19 @@
         "symfony/yaml": "4.4.*"
     },
     "require-dev": {
+        "php-parallel-lint/php-parallel-lint": "^1.0",
+        "pdepend/pdepend": "@stable",
+        "phploc/phploc": "^5.0",
+        "phpmd/phpmd": "@stable",
+        "sebastian/phpcpd": "^4.1",
+        "squizlabs/php_codesniffer": "*",
+        "symfony/debug-pack": "*",
+        "symfony/maker-bundle": "^1.0",
+        "symfony/phpunit-bridge": "^5.0",
+        "symfony/profiler-pack": "*",
+        "symfony/test-pack": "*",
+        "symfony/web-server-bundle": "4.4.*",
+        "theseer/phpdox": "^0.12.0"
     },
     "config": {
         "preferred-install": {

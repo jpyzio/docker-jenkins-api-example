@@ -1,62 +1,100 @@
-pipeline {
-    agent { label 'docker' }
-    triggers {
-        bitbucketPush ( )
-    }
-    environment {
-        // Określ zmienne środowiskowe .
-        APP_VERSION = '1'
-    }
-    stage {
-        stage ( 'Build' ) {
-            steps {
-                // Wydrukuj wszystkie zmienne środowiskowe .
-                sh 'printenv'
-                sh 'echo $ GIT_BRANCH'
-                sh'echo $ GIT_COMMIT'
-                echo 'Zainstaluj pakiety non-dev composer i przetestuj pamięć podręczną symfony wyczyść'
-                sh 'docker-compose -f build.yml up --exit-code-from fpm_build --remove-orphans fpm_build'
-                echo 'Tworzenie obrazy dockera z aktualną kompilacją dokera git commit '
-                sh ' -f Dockerfile-php-production -t register.example.com/symfony_project_fpm:$GIT_COMMIT. '
-                sh 'docker build -f Dockerfile-nginx -t register.example.com/symfony_project_nginx:$GIT_COMMIT.'
-                sh 'docker build -f Dockerfile-db -t register.example.com/symfony_project_db:$GIT_COMMIT.'
+#!/usr/bin/env groovy
 
+node {
 
-( 'Test' ) {
-            kroki {
-                echo 'Testy jednostkowe PHP'
-                sh 'docker-compose -f test.yml up -d --build --remove-orphans'
-                sh 'sleep 5'
-                sh 'docker-compose -f test. yml exec -T fpm_test bash build / php_unit.sh '
-            }
-        }
-        stage ( ' Push ' ) {
-            when {
-                branch ' master '
-            }
-            steps {
-                echo ' Deploying docker images '
-                shTag doker registry.example.com/symfony_project_fpm:$GIT_COMMIT registry.example.com/symfony_project_fpm:$APP_VERSION '
-                sh 'tag doker registry.example.com/symfony_project_fpm:$GIT_COMMIT registry.example.com/symfony_project_fpm:latest'
-                sh ' rejestr docker push register.example.com/symfony_project_fpm:$APP_VERSION '
-                sh ' docker push rejestru.example.com/symfony_project_fpm:latest '
-                sh ' docker tag register.example.com/symfony_project_nginx:$GIT_COMMIT rejestr.example.com/symfony_project_project.com/symfony_project APP_VERSION '
-                sh ' docker tag register.example.com/symfony_project_nginx:$GIT_COMMIT register.example.com/symfony_project_nginx :najnowszy'
-                sh 'docker push rejestru.example.com/symfony_project_nginx:$APP_VERSION'
-                sh 'docker push rejestru.example.com/symfony_project_nginx:
-                najświeższy ' sh 'docker tag register.example.com/symfony_project_db:$GIT_COMMIT register.example.com/symfony_project_db:$GIT_COMMIT : $ APP_VERSION '
-                sh 'tag doker registry.example.com/symfony_project_db:$GIT_COMMIT registry.example.com/symfony_project_db:latest'
-                sh 'doker Push registry.example.com/symfony_project_db:$APP_VERSION'
-                sh ' doker Push registry.example .com / symfony_project_db: najnowsze '
-            }
-        }
+    stage('Get code from SCM') {
+        checkout(
+                [$class: 'GitSCM', branches: [[name: 'master']],
+                 doGenerateSubmoduleConfigurations: false,
+                 extensions: [],
+                 submoduleCfg: [],
+                 userRemoteConfigs: [[url: 'https://github.com/jpyzio/docker-jenkins-api-example.git']]]
+//                  userRemoteConfigs: [[url: 'https://github.com/jpyzio/docker-jenkins-api-example.git',  credentialsId: 'user']]]
+        )
     }
-    post {
-        always {
-            // Zawsze porządkuj po kompilacji .
-            SH 'dokowanym-komponować -f build.yml dół'
-            SH 'dokowanym-komponować -f test.yml dół'
-            SH 'rm .env'
-        }
+
+    stage('Prepare') {
+        sh 'composer install'
+        sh 'bin/console assets:install'
+        sh 'bin/console cache:clear'
+//         sh 'bin/console doctrine:database:create'
+//         sh 'bin/console doctrine:migrations:migrate --no-interaction'
     }
+
+    stage('PHP Syntax check') {
+        sh 'vendor/bin/parallel-lint --exclude vendor/ --exclude ./bin .'
+    }
+
+    stage('Symfony Lint') {
+        sh 'bin/console lint:yaml src'
+        sh 'bin/console lint:yaml tests'
+        sh 'bin/console lint:twig src'
+        sh 'bin/console lint:twig tests'
+    }
+
+    stage("PHPUnit") {
+        sh 'bin/phpunit --coverage-html build/coverage --coverage-clover build/coverage/index.xml'
+    }
+
+    stage("Publish Coverage") {
+        publishHTML (target: [
+                allowMissing: false,
+                alwaysLinkToLastBuild: false,
+                keepAll: true,
+                reportDir: 'build/coverage',
+                reportFiles: 'index.html',
+                reportName: "Coverage Report"
+
+        ])
+    }
+
+    stage("Publish Clover") {
+        step([
+            $class: 'CloverPublisher',
+            cloverReportDir: 'build/coverage',
+            cloverReportFileName: 'index.xml',
+            healthyTarget: [methodCoverage: 70, conditionalCoverage: 80, statementCoverage: 80], // optional, default is: method=70, conditional=80, statement=80
+            unhealthyTarget: [methodCoverage: 50, conditionalCoverage: 50, statementCoverage: 50], // optional, default is none
+            failingTarget: [methodCoverage: 0, conditionalCoverage: 0, statementCoverage: 0]     // optional, default is none
+        ])
+    }
+
+    stage('Checkstyle Report') {
+        sh 'vendor/bin/phpcs --report=checkstyle --report-file=build/logs/checkstyle.xml --standard=phpcs.xml --extensions=php,inc -wp || exit 0'
+        checkstyle pattern: 'build/logs/checkstyle.xml'
+    }
+
+    stage('Mess Detection Report') {
+        sh 'vendor/bin/phpmd . xml phpmd.xml --reportfile build/logs/pmd.xml || exit 0'
+        pmd canRunOnFailed: true, pattern: 'build/logs/pmd.xml'
+    }
+
+    stage('CPD Report') {
+        sh 'vendor/bin/phpcpd --log-pmd build/logs/pmd-cpd.xml --exclude bin --exclude vendor --exclude src/Migrations --exclude var . --progress || exit 0'
+        dry canRunOnFailed: true, pattern: 'build/logs/pmd-cpd.xml'
+    }
+
+    stage('Lines of Code') {
+        sh ' vendor/bin/phploc --count-tests --log-csv build/logs/phploc.csv --log-xml build/logs/phploc.xml . --exclude vendor --exclude src/Migrations --exclude var .'
+    }
+
+    stage('Software metrics') {
+        sh 'vendor/bin/pdepend --jdepend-xml=build/logs/jdepend.xml --jdepend-chart=build/dependencies.svg --overview-pyramid=build/overview-pyramid.svg --ignore=vendor,var,bin,build .'
+    }
+
+    stage('Generate documentation') {
+        sh 'vendor/bin/phpdox -f phpdox.xml'
+    }
+    stage('Publish Documentation') {
+        publishHTML (target: [
+                allowMissing: false,
+                alwaysLinkToLastBuild: false,
+                keepAll: true,
+                reportDir: 'docs/html',
+                reportFiles: 'index.xhtml',
+                reportName: "PHPDox Documentation"
+
+        ])
+    }
+
 }
