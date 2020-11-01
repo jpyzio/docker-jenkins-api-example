@@ -50,19 +50,19 @@ pipeline {
             }
         }
 
-        stage("Publish Coverage") {
-            steps {
-                publishHTML (target: [
-                        allowMissing: false,
-                        alwaysLinkToLastBuild: false,
-                        keepAll: true,
-                        reportDir: 'build/coverage',
-                        reportFiles: 'index.html',
-                        reportName: "Coverage Report"
-
-                ])
-            }
-        }
+//         stage("Publish Coverage") {
+//             steps {
+//                 publishHTML (target: [
+//                         allowMissing: false,
+//                         alwaysLinkToLastBuild: false,
+//                         keepAll: true,
+//                         reportDir: 'build/coverage',
+//                         reportFiles: 'index.html',
+//                         reportName: "Coverage Report"
+//
+//                 ])
+//             }
+//         }
 
         stage("Publish Clover") {
             steps {
