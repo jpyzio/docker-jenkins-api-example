@@ -89,7 +89,7 @@ pipeline {
 
         stage('Mess Detection Report') {
             steps {
-                sh 'vendor/bin/phpmd . xml phpmd.xml --reportfile build/logs/pmd.xml'
+                sh 'vendor/bin/phpmd src/ xml phpmd.xml --reportfile build/logs/pmd.xml --exclude vendor/'
                 pmd canRunOnFailed: true, pattern: 'build/logs/pmd.xml'
             }
         }
