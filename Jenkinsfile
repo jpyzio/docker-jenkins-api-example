@@ -77,12 +77,12 @@ pipeline {
 //             }
 //         }
 
-//         stage('Checkstyle Report') {
-//             steps {
-//                 sh 'vendor/bin/phpcs --report=checkstyle --report-file=build/logs/checkstyle.xml --standard=phpcs.xml --extensions=php,inc -wp || exit 0'
-//                 checkstyle pattern: 'build/logs/checkstyle.xml'
-//             }
-//         }
+        stage('Checkstyle Report') {
+            steps {
+                sh 'vendor/bin/phpcs --report=checkstyle --report-file=build/logs/checkstyle.xml --standard=phpcs.xml.dist --extensions=php,inc -wp || exit 0'
+                checkstyle pattern: 'build/logs/checkstyle.xml'
+            }
+        }
 
 //         stage('Mess Detection Report') {
 //             steps {
