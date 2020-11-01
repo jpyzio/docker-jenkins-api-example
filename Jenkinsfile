@@ -44,25 +44,26 @@ pipeline {
             }
         }
 
-        stage("PHPUnit") {
-            steps {
-                sh 'bin/phpunit --coverage-html build/coverage --coverage-clover build/coverage/index.xml'
-            }
-        }
-
-        stage("Publish Coverage") {
-            steps {
-                publishHTML (target: [
-                        allowMissing: false,
-                        alwaysLinkToLastBuild: false,
-                        keepAll: true,
-                        reportDir: 'build/coverage',
-                        reportFiles: 'index.html',
-                        reportName: "Coverage Report"
-
-                ])
-            }
-        }
+// TODO: Doinstalować do obrazu php-xdebug
+//         stage("PHPUnit") {
+//             steps {
+//                 sh 'bin/phpunit --coverage-html build/coverage --coverage-clover build/coverage/index.xml'
+//             }
+//         }
+//
+//         stage("Publish Coverage") {
+//             steps {
+//                 publishHTML (target: [
+//                         allowMissing: false,
+//                         alwaysLinkToLastBuild: false,
+//                         keepAll: true,
+//                         reportDir: 'build/coverage',
+//                         reportFiles: 'index.html',
+//                         reportName: "Coverage Report"
+//
+//                 ])
+//             }
+//         }
 
 //         stage("Publish Clover") {
 //             steps {
