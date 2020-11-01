@@ -44,7 +44,7 @@ pipeline {
             }
         }
 
-TODO: Doinstalować do obrazu php-xdebug
+// TODO: Doinstalować do obrazu php-xdebug
         stage("PHPUnit") {
             steps {
                 sh 'bin/phpunit --coverage-html build/coverage --coverage-clover build/coverage/index.xml'
