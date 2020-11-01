@@ -87,12 +87,12 @@ pipeline {
             }
         }
 
-//         stage('Mess Detection Report') {
-//             steps {
-//                 sh 'vendor/bin/phpmd . xml phpmd.xml --reportfile build/logs/pmd.xml'
-//                 pmd canRunOnFailed: true, pattern: 'build/logs/pmd.xml'
-//             }
-//         }
+        stage('Mess Detection Report') {
+            steps {
+                sh 'vendor/bin/phpmd . xml phpmd.xml --reportfile build/logs/pmd.xml'
+                pmd canRunOnFailed: true, pattern: 'build/logs/pmd.xml'
+            }
+        }
 
 //         stage('CPD Report') {
 //             steps {
