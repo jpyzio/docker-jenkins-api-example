@@ -4,6 +4,7 @@ pipeline {
     agent {
         docker { image 'ittools/symfony44' }
     }
+
     stages {
         stage('Get code from SCM') {
             checkout(
@@ -99,6 +100,5 @@ pipeline {
 
             ])
         }
-
     }
 }
