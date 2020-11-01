@@ -110,11 +110,11 @@ pipeline {
 //             }
 //         }
 
-        stage('Generate documentation') {
-            steps {
-                sh 'vendor/bin/phpdox -f phpdox.xml'
-            }
-        }
+//         stage('Generate documentation') {
+//             steps {
+//                 sh 'vendor/bin/phpdox -f phpdox.xml'
+//             }
+//         }
 
 //         stage('Publish Documentation') {
 //             steps {
