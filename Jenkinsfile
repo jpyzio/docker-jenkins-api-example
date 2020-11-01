@@ -94,24 +94,24 @@ pipeline {
             }
         }
 
-//         stage('CPD Report') {
-//             steps {
-//                 sh 'vendor/bin/phpcpd --log-pmd build/logs/pmd-cpd.xml --exclude bin --exclude vendor --exclude src/Migrations --exclude var . --progress'
-//                 dry canRunOnFailed: true, pattern: 'build/logs/pmd-cpd.xml'
-//             }
-//         }
-//
-//         stage('Lines of Code') {
-//             steps {
-//                 sh ' vendor/bin/phploc --count-tests --log-csv build/logs/phploc.csv --log-xml build/logs/phploc.xml . --exclude vendor --exclude src/Migrations --exclude var .'
-//             }
-//         }
-//
-//         stage('Software metrics') {
-//             steps {
-//                 sh 'vendor/bin/pdepend --jdepend-xml=build/logs/jdepend.xml --jdepend-chart=build/dependencies.svg --overview-pyramid=build/overview-pyramid.svg --ignore=vendor,var,bin,build .'
-//             }
-//         }
+        stage('CPD Report') {
+            steps {
+                sh 'vendor/bin/phpcpd --log-pmd build/logs/pmd-cpd.xml --exclude bin --exclude vendor --exclude src/Migrations --exclude var . --progress'
+                dry canRunOnFailed: true, pattern: 'build/logs/pmd-cpd.xml'
+            }
+        }
+
+        stage('Lines of Code') {
+            steps {
+                sh 'vendor/bin/phploc --count-tests --log-csv build/logs/phploc.csv --log-xml build/logs/phploc.xml . --exclude vendor --exclude src/Migrations --exclude var .'
+            }
+        }
+
+        stage('Software metrics') {
+            steps {
+                sh 'vendor/bin/pdepend --jdepend-xml=build/logs/jdepend.xml --jdepend-chart=build/dependencies.svg --overview-pyramid=build/overview-pyramid.svg --ignore=vendor,var,bin,build .'
+            }
+        }
 
 //         stage('Generate documentation') {
 //             steps {
