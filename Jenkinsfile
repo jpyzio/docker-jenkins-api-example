@@ -81,7 +81,7 @@ pipeline {
         stage('CPD Report') {
           steps {
             sh 'vendor/bin/phpcpd --log-pmd build/logs/pmd-cpd.xml --exclude bin --exclude vendor --exclude src/Migrations --exclude var . --progress'
-            echo 'Dodaj: dry canRunOnFailed: true, pattern: \'build/logs/pmd-cpd.xml\''
+            dry canRunOnFailed: true, pattern: 'build/logs/pmd-cpd.xml'
           }
         }
 
@@ -99,7 +99,7 @@ pipeline {
 
         stage('Generate documentation') {
           steps {
-            echo 'Dodaj: vendor/bin/phpdox -f phpdox.xml'
+            sh 'vendor/bin/phpdox -f phpdox.xml'
           }
         }
 
@@ -109,7 +109,14 @@ pipeline {
     stage('Documentation') {
       steps {
         sh 'vendor/bin/phpdox -f phpdox.xml'
-        echo 'Dodaj: publishHTML (target: [ //                         allowMissing: false, //                         alwaysLinkToLastBuild: false, //                         keepAll: true, //                         reportDir: \'docs/html\', //                         reportFiles: \'index.xhtml\', //                         reportName: "PHPDox Documentation" // //                 ])'
+        publishHTML (target: [
+          allowMissing: false,
+          alwaysLinkToLastBuild: false,
+          keepAll: true,
+          reportDir: 'docs/html',
+          reportFiles: 'index.xhtml',
+          reportName: "PHPDox Documentation"
+        ])
       }
     }
 
