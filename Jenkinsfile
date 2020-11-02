@@ -12,5 +12,13 @@ pipeline {
       }
     }
 
+    stage('Prepare') {
+      steps {
+        sh 'composer install'
+        sh 'bin/console assets:install'
+        sh 'bin/console cache:clear'
+      }
+    }
+
   }
 }
