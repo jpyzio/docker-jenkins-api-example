@@ -1,5 +1,8 @@
 build/*
 !build/.gitkeep
+!build/coverage/.gitkeep
+!build/logs/.gitkeep
+
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php
