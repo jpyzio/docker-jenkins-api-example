@@ -2,6 +2,9 @@ build/*
 !build/.gitkeep
 !build/coverage/.gitkeep
 !build/logs/.gitkeep
+!build/phpdox/xml/.gitkeep
+docs/*
+!docs/.gitkeep
 
 ###> symfony/framework-bundle ###
 /.env.local
