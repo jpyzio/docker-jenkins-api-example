@@ -6,7 +6,7 @@ namespace App\Service;
 
 class Foo
 {
-    public function getFoo(): string
+    public function getFoo() : string
     {
         return 'Foo';
     }
