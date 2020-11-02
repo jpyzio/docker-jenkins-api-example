@@ -40,13 +40,27 @@ pipeline {
         stage('PHPUnit') {
           steps {
             sh 'bin/phpunit --coverage-html build/coverage --coverage-clover build/coverage/index.xml'
-            echo 'Dodaj: publishHTML (target: [                         allowMissing: false,                         alwaysLinkToLastBuild: false,                         keepAll: true,                         reportDir: \'build/coverage\',                         reportFiles: \'index.html\',                         reportName: "Coverage Report"                  ])'
+            publishHTML (target: [
+              allowMissing: false,
+              alwaysLinkToLastBuild: false,
+              keepAll: true,
+              reportDir: 'build/coverage',
+              reportFiles: 'index.html',
+              reportName: "Coverage Report"
+            ])
           }
         }
 
         stage('Publish Clover') {
           steps {
-            echo 'Dodaj: step([                     $class: \'CloverPublisher\',                     cloverReportDir: \'build/coverage\',                     cloverReportFileName: \'index.xml\',                     healthyTarget: [methodCoverage: 70, conditionalCoverage: 80, statementCoverage: 80], // optional, default is: method=70, conditional=80, statement=80                     unhealthyTarget: [methodCoverage: 50, conditionalCoverage: 50, statementCoverage: 50], // optional, default is none                     failingTarget: [methodCoverage: 0, conditionalCoverage: 0, statementCoverage: 0]     // optional, default is none                 ])'
+            step([
+              $class: 'CloverPublisher',
+              cloverReportDir: 'build/coverage',
+              cloverReportFileName: 'index.xml',
+              healthyTarget: [methodCoverage: 70, conditionalCoverage: 80, statementCoverage: 80], // optional, default is: method=70, conditional=80, statement=80
+              unhealthyTarget: [methodCoverage: 50, conditionalCoverage: 50, statementCoverage: 50], // optional, default is none
+              failingTarget: [methodCoverage: 0, conditionalCoverage: 0, statementCoverage: 0]     // optional, default is none
+            ])
           }
         }
 
